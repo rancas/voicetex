@@ -1,24 +1,40 @@
 import { Router } from "express";
 import db from "../db.js";
 
+interface SessionRow {
+  id: string;
+  current_history_id: number | null;
+}
+
+interface HistoryRow {
+  id: number;
+  session_id: string;
+  latex_content: string;
+  source: string;
+  transcript: string | null;
+  created_at: string;
+}
+
 const router = Router({ mergeParams: true });
+
+function getSessionId(req: { params: Record<string, string> }): string {
+  return req.params.id;
+}
 
 // Get all history entries for a session
 router.get("/", (req, res) => {
   const entries = db
     .prepare("SELECT * FROM history_entries WHERE session_id = ? ORDER BY id ASC")
-    .all(req.params.id);
+    .all(getSessionId(req));
   res.json({ success: true, data: entries });
 });
 
 // Add a new history entry
 router.post("/", (req, res) => {
   const { latex_content, source, transcript } = req.body;
-  const sessionId = req.params.id;
+  const sessionId = getSessionId(req);
 
-  const session = db.prepare("SELECT * FROM sessions WHERE id = ?").get(sessionId) as {
-    current_history_id: number | null;
-  } | undefined;
+  const session = db.prepare("SELECT * FROM sessions WHERE id = ?").get(sessionId) as SessionRow | undefined;
 
   if (!session) {
     res.status(404).json({ success: false, error: "Session not found" });
@@ -55,10 +71,8 @@ router.post("/", (req, res) => {
 
 // Undo
 router.post("/undo", (req, res) => {
-  const sessionId = req.params.id;
-  const session = db.prepare("SELECT * FROM sessions WHERE id = ?").get(sessionId) as {
-    current_history_id: number | null;
-  } | undefined;
+  const sessionId = getSessionId(req);
+  const session = db.prepare("SELECT * FROM sessions WHERE id = ?").get(sessionId) as SessionRow | undefined;
 
   if (!session) {
     res.status(404).json({ success: false, error: "Session not found" });
@@ -78,7 +92,7 @@ router.post("/undo", (req, res) => {
   }
 
   db.prepare("UPDATE sessions SET current_history_id = ?, updated_at = datetime('now') WHERE id = ?").run(
-    (prevEntry as { id: number }).id,
+    (prevEntry as HistoryRow).id,
     sessionId
   );
 
@@ -87,10 +101,8 @@ router.post("/undo", (req, res) => {
 
 // Redo
 router.post("/redo", (req, res) => {
-  const sessionId = req.params.id;
-  const session = db.prepare("SELECT * FROM sessions WHERE id = ?").get(sessionId) as {
-    current_history_id: number | null;
-  } | undefined;
+  const sessionId = getSessionId(req);
+  const session = db.prepare("SELECT * FROM sessions WHERE id = ?").get(sessionId) as SessionRow | undefined;
 
   if (!session) {
     res.status(404).json({ success: false, error: "Session not found" });
@@ -110,7 +122,7 @@ router.post("/redo", (req, res) => {
   }
 
   db.prepare("UPDATE sessions SET current_history_id = ?, updated_at = datetime('now') WHERE id = ?").run(
-    (nextEntry as { id: number }).id,
+    (nextEntry as HistoryRow).id,
     sessionId
   );
 

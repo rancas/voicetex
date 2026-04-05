@@ -83,3 +83,7 @@ reference/
 # Database
 data/
 dist-server/
+dist-electron/
+
+# Electron
+release/

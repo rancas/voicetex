@@ -1,0 +1,43 @@
+appId: com.voicetex.app
+productName: VoiceTeX
+copyright: Copyright (c) 2026 Luca Secchi
+
+directories:
+  output: release
+
+files:
+  - dist-electron/**/*
+  - node_modules/**/*
+  - package.json
+
+extraResources:
+  - from: dist
+    to: dist
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: public/vite.svg
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  category: Education
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+asar:
+  smartUnpack: true
+
+npmRebuild: true
