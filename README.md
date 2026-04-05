@@ -17,38 +17,82 @@ Dictate mathematical formulas with your voice and get LaTeX in real time. Edit w
 - **Cost tracking** - Live session cost counter for API usage
 - **Dark mode** - Automatic or manual theme switching
 
+## Downloads
+
+Pre-built binaries are available on the [Releases page](https://github.com/rancas/voicetex/releases).
+
+### Windows
+| Package | Size | Description |
+|---------|------|-------------|
+| `VoiceTeX-Setup.exe` | ~5 MB | Installer (Rust backend) - lightweight, opens in browser |
+| `VoiceTeX.Setup.x.x.x.exe` | ~200 MB | Installer (Electron) - standalone desktop app |
+
+### Linux
+| Package | Size | Description |
+|---------|------|-------------|
+| `voicetex-backend` | ~5 MB | Standalone binary (Rust) - run and open browser |
+| `VoiceTeX-x.x.x.AppImage` | ~200 MB | Desktop app (Electron) |
+| `voicetex_x.x.x_amd64.deb` | ~150 MB | Debian/Ubuntu package (Electron) |
+
 ## Quick Start
 
-```bash
-# Install dependencies
-npm install
+### Option 1: Rust backend (lightweight)
 
-# Start dev server (frontend + backend)
+Download the binary for your platform from [Releases](https://github.com/rancas/voicetex/releases), then:
+
+```bash
+# Linux
+chmod +x voicetex-backend
+NODE_ENV=production ./voicetex-backend
+# Opens at http://localhost:3001
+
+# Windows: run VoiceTeX-Setup.exe installer, then launch from Start Menu
+```
+
+### Option 2: Development (from source)
+
+```bash
+# With Node.js backend (Express)
+npm install
 npm run dev
+
+# With Rust backend
+npm install
+npm run dev:rust
 ```
 
 Open http://localhost:5173, create a new session, enter your OpenAI API key in Settings, and start dictating.
 
 ## Architecture
 
+The app has two interchangeable backends. The frontend doesn't know which one is running.
+
 | Component | Technology |
 |-----------|-----------|
 | Frontend | React 19, TypeScript, Tailwind CSS, Vite |
-| Backend | Express.js, better-sqlite3 |
+| Backend (Node.js) | Express.js 5, better-sqlite3 |
+| Backend (Rust) | Axum, rusqlite |
+| Desktop wrapper | Electron (optional) |
 | Transcription (local) | Whisper via @xenova/transformers (WebGPU) |
 | Transcription (cloud) | OpenAI gpt-4o-mini-transcribe |
 | LaTeX generation | OpenAI chat completions (streaming) |
 | LaTeX rendering | MathJax 3 |
+| Database | SQLite (shared schema between backends) |
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start frontend (Vite) + backend (Express) concurrently |
-| `npm run dev:frontend` | Start Vite dev server only |
-| `npm run dev:backend` | Start Express backend only |
+| `npm run dev` | Frontend + Express backend |
+| `npm run dev:rust` | Frontend + Rust backend |
+| `npm run dev:frontend` | Vite dev server only |
+| `npm run dev:backend` | Express backend only |
+| `npm run dev:backend:rust` | Rust backend only |
 | `npm run build` | Build frontend for production |
-| `npm start` | Start production server |
+| `npm start` | Start Express production server |
+| `npm run electron:build:linux` | Build Electron desktop app (Linux) |
+| `npm run electron:build` | Build Electron desktop app (Windows) |
+| `cargo build --release -p voicetex-backend` | Build Rust backend binary |
 
 ## Credits
 
@@ -63,10 +107,13 @@ This project is a fork of [Speech to LaTeX](https://github.com/Thomas-McKanna/sp
 - Added voice editing mode for correcting formulas
 - Added manual LaTeX editing with live preview
 - Added Express.js backend with SQLite for persistence
-- Added session management with sidebar
+- Added Rust backend (Axum + rusqlite) as lightweight alternative
+- Added session management with sidebar and date filtering
 - Added undo/redo with full change history
 - Added API cost tracking
-- Added date filtering for sessions
+- Added Electron desktop packaging (Windows + Linux)
+- Added Windows installer via Inno Setup (for Rust backend)
+- Added GitHub Actions CI/CD for multi-platform builds
 
 ## License
 
