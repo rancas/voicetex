@@ -36,9 +36,7 @@ jobs:
         run: npm run electron:compile
 
       - name: Build Electron app
-        run: npx electron-builder ${{ matrix.targets }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder ${{ matrix.targets }} --publish never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
