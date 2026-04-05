@@ -35,6 +35,8 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
+  allowElevation: true
+  runAfterFinish: false
 
 asar:
   smartUnpack: true
