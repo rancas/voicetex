@@ -22,7 +22,7 @@ function getMimeType() {
 
 export default function AudioRecorder(props: {
   isRecording: boolean;
-  onRecordingToggle: (blob?: Blob) => void;
+  onRecordingToggle: (blob?: Blob, durationMs?: number) => void;
   disabled?: boolean;
 }) {
   const [duration, setDuration] = useState(0);
@@ -88,7 +88,7 @@ export default function AudioRecorder(props: {
             }
           }
 
-          props.onRecordingToggle(blob);
+          props.onRecordingToggle(blob, recordingDuration);
         });
 
         mediaRecorder.start(1000); // Collect data every second for better reliability

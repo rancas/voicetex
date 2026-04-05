@@ -1,80 +1,76 @@
-# Speech to LaTeX
+# VoiceTeX
 
-
+Dictate mathematical formulas with your voice and get LaTeX in real time. Edit with voice commands or manually, undo/redo every change, and manage multiple sessions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Built with WebLLM](https://img.shields.io/badge/Built%20with-WebLLM-blue)](https://github.com/mlc-ai/web-llm)
-[![Powered by Whisper](https://img.shields.io/badge/Powered%20by-Whisper-orange)](https://github.com/xenova/whisper-web)
-[![Rendered with MathJax](https://img.shields.io/badge/Rendered%20with-MathJax-green)](https://www.mathjax.org/)
-
-https://github.com/user-attachments/assets/595ae5fd-17d8-49bc-b811-ad450c06a02a
-
-## [🚀 Try it now!](https://thomas-mckanna.github.io/speech-to-latex/)
-
-## Overview
-
-Speech to LaTeX is a powerful web application that converts spoken mathematics into LaTeX expressions, running entirely in your browser. No server required! Simply speak your mathematical expressions, and watch as they're transformed into beautifully formatted LaTeX.
 
 ## Features
 
-- 🎤 **Voice to LaTeX** - Dictate mathematical expressions naturally
-- 💻 **100% Client-side** - All processing happens in your browser
-- 🔒 **Privacy-focused** - No data leaves your device
-- 🌐 **Works offline** - Once loaded, no internet connection needed
-- ⚡ **Real-time conversion** - See results as you speak
-- 🎛️ **Customizable models** - Choose from different Whisper and LLM models
+- **Voice-to-LaTeX** - Speak a math expression, get LaTeX instantly via OpenAI GPT models
+- **Dual transcription** - Local Whisper (offline, free) or OpenAI API (faster, multilingual)
+- **Voice editing** - Say corrections to modify existing formulas
+- **Manual editing** - Click to edit LaTeX code directly with live preview
+- **Undo/Redo** - Full history of every change (Ctrl+Z / Ctrl+Shift+Z)
+- **Sessions** - Persistent sessions saved in SQLite, resume where you left off
+- **Multi-language** - Dictate in 20+ languages
+- **Model selection** - Choose any OpenAI model (GPT-5.4, GPT-4.1, o3, etc.)
+- **Cost tracking** - Live session cost counter for API usage
+- **Dark mode** - Automatic or manual theme switching
 
-## How It Works
-
-Speech to LaTeX combines three powerful technologies:
-
-1. **[Whisper Web](https://github.com/xenova/whisper-web)** - Transcribes your speech to text
-2. **[WebLLM](https://github.com/mlc-ai/web-llm)** - Converts transcribed text to LaTeX expressions
-3. **[MathJax](https://www.mathjax.org/)** - Renders LaTeX expressions beautifully in the browser
-
-## Getting Started
-
-1. Visit the [Speech to LaTeX app](https://your-deployment-url.com)
-2. Allow microphone access when prompted
-3. Click the microphone button and start speaking your mathematical expression
-4. Watch as your speech is converted to LaTeX in real-time
-5. Copy the generated LaTeX code or view the rendered expression
-
-## Example Expressions
-
-Try saying:
-- "The quadratic formula is x equals negative b plus or minus the square root of b squared minus 4ac all over 2a"
-- "The integral from 0 to infinity of e to the negative x squared dx equals square root of pi over 2"
-- "The sum from n equals 1 to infinity of 1 over n squared equals pi squared over 6"
-
-## Local Development
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/Thomas-McKanna/speech-to-latex.git
-
-# Navigate to the project directory
-cd speech-to-latex
-
 # Install dependencies
 npm install
 
-# Start the development server
+# Start dev server (frontend + backend)
 npm run dev
 ```
 
-## Contributing
+Open http://localhost:5173, create a new session, enter your OpenAI API key in Settings, and start dictating.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Architecture
 
-## Acknowledgements
+| Component | Technology |
+|-----------|-----------|
+| Frontend | React 19, TypeScript, Tailwind CSS, Vite |
+| Backend | Express.js, better-sqlite3 |
+| Transcription (local) | Whisper via @xenova/transformers (WebGPU) |
+| Transcription (cloud) | OpenAI gpt-4o-mini-transcribe |
+| LaTeX generation | OpenAI chat completions (streaming) |
+| LaTeX rendering | MathJax 3 |
 
-This project wouldn't be possible without these amazing open-source projects:
+## Scripts
 
-- [WebLLM](https://github.com/mlc-ai/web-llm) - For running LLMs directly in the browser
-- [Whisper Web](https://github.com/xenova/whisper-web) - For browser-based speech recognition
-- [MathJax](https://www.mathjax.org/) - For rendering LaTeX expressions
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start frontend (Vite) + backend (Express) concurrently |
+| `npm run dev:frontend` | Start Vite dev server only |
+| `npm run dev:backend` | Start Express backend only |
+| `npm run build` | Build frontend for production |
+| `npm start` | Start production server |
+
+## Credits
+
+This project is a fork of [Speech to LaTeX](https://github.com/Thomas-McKanna/speech-to-latex) by [Thomas McKanna](https://github.com/Thomas-McKanna), originally a client-side app using WebLLM for local LLM inference.
+
+### Changes from the original
+
+- Replaced WebLLM (local browser LLM) with OpenAI API for LaTeX generation
+- Added OpenAI audio transcription as alternative to local Whisper
+- Added multi-language support (20+ languages)
+- Added LLM model selector with full OpenAI model catalog
+- Added voice editing mode for correcting formulas
+- Added manual LaTeX editing with live preview
+- Added Express.js backend with SQLite for persistence
+- Added session management with sidebar
+- Added undo/redo with full change history
+- Added API cost tracking
+- Added date filtering for sessions
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) for details.
+
+Original work copyright (c) 2025 Thomas McKanna.
+VoiceTeX modifications copyright (c) 2026 Luca Secchi.

@@ -49,20 +49,15 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  justify-content: center;
   min-width: 320px;
   min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  /* Remove transition for instant mode switching */
   overflow-x: hidden;
 }
 
 #root {
   width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 h1 {

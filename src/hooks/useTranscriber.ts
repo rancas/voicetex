@@ -32,12 +32,14 @@ export interface TranscriberData {
     chunks: { text: string; timestamp: [number, number | null] }[];
 }
 
+export type TranscriberBackend = "local" | "openai";
+
 export interface Transcriber {
     onInputChange: () => void;
     isBusy: boolean;
     isModelLoading: boolean;
     progressItems: ProgressItem[];
-    start: (audioData: AudioBuffer | undefined) => void;
+    start: (blob: Blob | undefined, durationMs?: number) => void;
     output?: TranscriberData;
     model: string;
     setModel: (model: string) => void;
@@ -143,24 +145,30 @@ export function useTranscriber(): Transcriber {
     }, []);
 
     const postRequest = useCallback(
-        async (audioData: AudioBuffer | undefined) => {
-            if (audioData) {
-                setTranscript(undefined);
-                setIsBusy(true);
+        async (blob: Blob | undefined, _durationMs?: number) => {
+            if (!blob) return;
 
-                let audio;
+            setTranscript(undefined);
+            setIsBusy(true);
+
+            try {
+                const arrayBuffer = await blob.arrayBuffer();
+                const audioCTX = new AudioContext({
+                    sampleRate: Constants.SAMPLING_RATE,
+                });
+                const audioData = await audioCTX.decodeAudioData(arrayBuffer);
+
+                let audio: Float32Array;
                 if (audioData.numberOfChannels === 2) {
                     const SCALING_FACTOR = Math.sqrt(2);
-
-                    let left = audioData.getChannelData(0);
-                    let right = audioData.getChannelData(1);
+                    const left = audioData.getChannelData(0);
+                    const right = audioData.getChannelData(1);
 
                     audio = new Float32Array(left.length);
                     for (let i = 0; i < audioData.length; ++i) {
-                        audio[i] = SCALING_FACTOR * (left[i] + right[i]) / 2;
+                        audio[i] = (SCALING_FACTOR * (left[i] + right[i])) / 2;
                     }
                 } else {
-                    // If the audio is not stereo, we can just use the first channel:
                     audio = audioData.getChannelData(0);
                 }
 
@@ -173,6 +181,9 @@ export function useTranscriber(): Transcriber {
                     language:
                         multilingual && language !== "auto" ? language : null,
                 });
+            } catch (error) {
+                setIsBusy(false);
+                console.error("Error decoding audio:", error);
             }
         },
         [webWorker, model, multilingual, quantized, subtask, language],

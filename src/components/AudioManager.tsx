@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Constants from "../utils/Constants";
 import { Transcriber } from "../hooks/useTranscriber";
 import Progress from "./Progress";
 import AudioRecorder from "./AudioRecorder";
@@ -14,29 +13,6 @@ export function AudioManager({
   isModelLoading?: boolean;
 }) {
   const [isRecording, setIsRecording] = useState(false);
-
-  const processAudioRecording = async (data: Blob) => {
-    if (!data) return;
-
-    const fileReader = new FileReader();
-
-    fileReader.onloadend = async () => {
-      try {
-        const audioCTX = new AudioContext({
-          sampleRate: Constants.SAMPLING_RATE,
-        });
-        const arrayBuffer = fileReader.result as ArrayBuffer;
-        const decoded = await audioCTX.decodeAudioData(arrayBuffer);
-
-        // Start transcription immediately
-        transcriber.start(decoded);
-      } catch (error) {
-        console.error("Error processing audio:", error);
-      }
-    };
-
-    fileReader.readAsArrayBuffer(data);
-  };
 
   // When transcription is complete, pass the text to parent component
   useEffect(() => {
@@ -59,11 +35,11 @@ export function AudioManager({
           <div className="mb-4 transform scale-125">
             <AudioRecorder
               isRecording={isRecording}
-              onRecordingToggle={(blob) => {
+              onRecordingToggle={(blob, durationMs) => {
                 setIsRecording(!isRecording);
                 if (blob) {
                   transcriber.onInputChange();
-                  processAudioRecording(blob);
+                  transcriber.start(blob, durationMs);
                 }
               }}
               disabled={isModelLoading || transcriber.isModelLoading}
