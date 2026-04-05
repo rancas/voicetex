@@ -87,3 +87,6 @@ dist-electron/
 
 # Electron
 release/
+
+# Rust
+backend-rust/target/

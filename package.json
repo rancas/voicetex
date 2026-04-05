@@ -11,6 +11,8 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "vite",
     "dev:backend": "tsx watch server/index.ts",
+    "dev:backend:rust": "cargo run --manifest-path backend-rust/Cargo.toml",
+    "dev:rust": "concurrently \"npm run dev:frontend\" \"npm run dev:backend:rust\"",
     "build": "vite build",
     "start": "node --import tsx server/index.ts",
     "electron:dev": "concurrently \"npm run dev:frontend\" \"tsx electron/main.ts\"",
